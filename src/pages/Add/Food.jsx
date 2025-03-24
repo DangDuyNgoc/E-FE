@@ -21,13 +21,7 @@ const Product = ({ url }) => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${url}/api/product/all-products`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log(response.data);
-      console.log("123");
+      const response = await axios.get(`${url}/api/product/all-products`);
       if (response.data.success) {
         setProducts(response.data.data);
       } else {

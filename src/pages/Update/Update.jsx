@@ -10,6 +10,7 @@ const Update = ({ url }) => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [imagePreview, setImagePreview] = useState("");
   const [name, setName] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState(null);
@@ -19,24 +20,27 @@ const Update = ({ url }) => {
   useEffect(() => {
     const fetchFood = async () => {
       try {
-        const { data } = await axios.get(`${url}/api/food/${id}`);
-        setName(data.food.name);
-        setDescription(data.food.description);
-        setPrice(data.food.price);
-        setSelectedCategory(data.food.category);
-        setImagePreview(`${url}/images/${data.food.image}`);
+        const { data } = await axios.get(
+          `${url}/api/product/get-product/${id}`
+        );
+        setName(data.data.name);
+        setDescription(data.data.description);
+        setPrice(data.data.price);
+        setQuantity(data.data.quantity);
+        setSelectedCategory(data.data.category);
+        setImagePreview(data.data.imageUrl);
       } catch (error) {
-        console.error("Failed to fetch food:", error);
-        toast.error("Failed to fetch food details.");
+        console.error("Failed to fetch product:", error);
+        toast.error("Failed to fetch product details.");
       }
     };
 
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
-          `${url}/api/category/get-list-category`
+          `${url}/api/category/get-all-category`
         );
-        setCategories(response.data.categories);
+        setCategories(response.data.category);
       } catch (error) {
         console.error("Failed to fetch categories:", error);
       }
@@ -67,20 +71,29 @@ const Update = ({ url }) => {
       formData.append("name", name);
       formData.append("description", description);
       formData.append("price", price);
+      formData.append("quantity", quantity);
       formData.append("category", selectedCategory);
       if (image) {
         formData.append("image", image);
       }
 
-      const { data } = await axios.put(`${url}/api/food/update`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ": ", pair[1]);
+      }
+
+      const { data } = await axios.put(
+        `${url}/api/product/update-product/${id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (data?.success) {
-        navigate("/food");
-        toast.success(data?.message);
+        navigate("/product");
+        toast.success("Updated");
       } else {
         toast.error(data?.message);
       }
@@ -121,7 +134,19 @@ const Update = ({ url }) => {
             type="number"
             name="price"
             value={price}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => setPrice(e.target.value)}
+            className="border border-gray-300 p-2 w-full"
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Quantity:</label>
+          <input
+            type="number"
+            name="quantity"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
             className="border border-gray-300 p-2 w-full"
             required
           />
@@ -145,15 +170,23 @@ const Update = ({ url }) => {
           </select>
         </div>
         <div className="mb-4">
-          <label className="block mb-2" htmlFor="image">
+          <label className="block mb-2 cursor-pointer" htmlFor="image">
             Image:
-            <img alt="" src={imagePreview} />
+            {imagePreview ? (
+              <img
+                alt="Preview"
+                src={imagePreview}
+                className="w-32 h-32 object-cover"
+              />
+            ) : (
+              <p>No image available</p>
+            )}
           </label>
           <input
             type="file"
             id="image"
-            className="border border-gray-300 p-2 w-full"
             hidden
+            className="border border-gray-300 p-2 w-full"
             onChange={handleImageChange}
           />
         </div>

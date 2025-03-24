@@ -25,10 +25,10 @@ const Add = ({ url }) => {
         const response = await axios.get(
           `${url}/api/category/get-all-category`
         );
-        setCategories(response.data.categories);
+        setCategories(response.data.category);
         setData((prevData) => ({
           ...prevData,
-          category: response.data.categories[0]?._id || "",
+          category: response.data.category[0]?._id || "",
         }));
       } catch (error) {
         console.error("Failed to fetch categories:", error);
