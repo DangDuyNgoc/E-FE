@@ -81,7 +81,7 @@ const Product = ({ url }) => {
       if (response.data.success) {
         setProducts(response.data.data)
       } else {
-        setFilteredProducts([]);
+        setProducts([]);
       }
     } catch (error) {
       toast.error("Search error");
