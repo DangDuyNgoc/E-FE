@@ -27,6 +27,7 @@ const Product = ({ url }) => {
           Authorization: `Bearer ${token}`,
         },
       });
+      const response = await axios.get(`${url}/api/product/all-products`);
       if (response.data.success) {
         setProducts(response.data.data);
       } else {

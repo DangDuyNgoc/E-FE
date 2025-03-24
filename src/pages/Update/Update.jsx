@@ -10,6 +10,7 @@ const Update = ({ url }) => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [imagePreview, setImagePreview] = useState("");
   const [name, setName] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -27,9 +28,20 @@ const Update = ({ url }) => {
         setQuantity(res.data.data.quantity);
         setSelectedCategory(res.data.data.category);
         setImagePreview(res.data.data.imageUrl);
+        
+        const { data } = await axios.get(
+          `${url}/api/product/get-product/${id}`
+        );
+        setName(data.data.name);
+        setDescription(data.data.description);
+        setPrice(data.data.price);
+        setQuantity(data.data.quantity);
+        setSelectedCategory(data.data.category);
+        setImagePreview(data.data.imageUrl);
+
       } catch (error) {
-        console.error("Failed to fetch food:", error);
-        toast.error("Failed to fetch food details.");
+        console.error("Failed to fetch product:", error);
+        toast.error("Failed to fetch product details.");
       }
     };
 
@@ -69,11 +81,16 @@ const Update = ({ url }) => {
       formData.append("name", name);
       formData.append("description", description);
       formData.append("price", price);
+
       formData.append("quantity", quantity)
+
+      formData.append("quantity", quantity);
+
       formData.append("category", selectedCategory);
       if (image) {
         formData.append("imageUrl", image);
       }
+
 
       const { data } = await axios.put(
         `${url}/api/product/update-product/${id}`,
@@ -88,6 +105,8 @@ const Update = ({ url }) => {
       if (data?.success) {
         navigate("/product");
         toast.success(data?.message);
+        toast.success("Updated");
+
       } else {
         toast.error(data?.message);
       }
@@ -133,6 +152,7 @@ const Update = ({ url }) => {
             required
           />
         </div>
+
         <div className="mb-4">
           <label className="block mb-2">Quantity:</label>
           <input
@@ -162,7 +182,7 @@ const Update = ({ url }) => {
           </select>
         </div>
         <div className="mb-4">
-          <label className="block mb-2" htmlFor="image">
+          <label className="block mb-2 cursor-pointer" htmlFor="image">
             Image:
             <div className="w-full h-40 border flex items-center justify-center bg-gray-100">
               {imagePreview ? (
@@ -179,8 +199,8 @@ const Update = ({ url }) => {
           <input
             type="file"
             id="image"
-            className="border border-gray-300 p-2 w-full"
             hidden
+            className="border border-gray-300 p-2 w-full"
             onChange={handleImageChange}
           />
         </div>
