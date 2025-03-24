@@ -14,6 +14,7 @@ const Add = ({ url }) => {
     price: "",
     description: "",
     category: "",
+    quantity: "",
   });
 
   const token = localStorage.getItem("token");
@@ -25,10 +26,10 @@ const Add = ({ url }) => {
         const response = await axios.get(
           `${url}/api/category/get-all-category`
         );
-        setCategories(response.data.categories);
+        setCategories(response.data.category);
         setData((prevData) => ({
           ...prevData,
-          category: response.data.categories[0]?._id || "",
+          category: response.data.category[0]?._id || "",
         }));
       } catch (error) {
         console.error("Failed to fetch categories:", error);
@@ -53,7 +54,8 @@ const Add = ({ url }) => {
       !data.price ||
       !data.description ||
       !data.category ||
-      !image
+      !image ||
+      !data.quantity
     ) {
       return toast.error("Please fill out all fields!");
     }
@@ -64,9 +66,10 @@ const Add = ({ url }) => {
       formData.append("description", data.description);
       formData.append("price", Number(data.price));
       formData.append("category", data.category);
-      formData.append("image", image);
+      formData.append("imageUrl", image);
+      formData.append("quantity", data.quantity);
 
-      const response = await axios.post(`${url}/api/product/add`, formData, {
+      const response = await axios.post(`${url}/api/product/add-product`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
@@ -79,6 +82,7 @@ const Add = ({ url }) => {
           price: "",
           description: "",
           category: categories[0]?._id || "",
+          quantity: "",
         });
         setImage(false);
         toast.success(response.data.message);
@@ -156,6 +160,16 @@ const Add = ({ url }) => {
               type="number"
               name="price"
               placeholder="price"
+            />
+          </div>
+          <div className="add-price flex-col">
+            <p>Product quantity</p>
+            <input
+              onChange={onChangeHandler}
+              value={data.quantity}
+              type="number"
+              name="quantity"
+              placeholder="quantity"
             />
           </div>
         </div>

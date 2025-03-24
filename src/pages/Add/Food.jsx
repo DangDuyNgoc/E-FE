@@ -4,6 +4,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import SearchProduct from "../../components/Search/Search";
 
 const { confirm } = Modal;
 
@@ -26,8 +27,6 @@ const Product = ({ url }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response.data);
-      console.log("123");
       if (response.data.success) {
         setProducts(response.data.data);
       } else {
@@ -48,7 +47,7 @@ const Product = ({ url }) => {
       onOk: async () => {
         try {
           const response = await axios.delete(
-            `${url}/api/product/remove/${id}`,
+            `${url}/api/product/delete-product/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -70,6 +69,25 @@ const Product = ({ url }) => {
         console.log("Cancel delete action");
       },
     });
+  };
+
+  const handleSearch = async (query) => {
+    setLoading(true);
+    try {
+      const response = await axios.post(`${url}/api/product/search-products`, {
+        query,
+      });
+
+      if (response.data.success) {
+        setProducts(response.data.data)
+      } else {
+        setFilteredProducts([]);
+      }
+    } catch (error) {
+      toast.error("Search error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const columns = [
@@ -95,6 +113,11 @@ const Product = ({ url }) => {
       title: "Price",
       dataIndex: "price",
       key: "price",
+    },
+    {
+      title: "Quantity",
+      dataIndex: "quantity",
+      key: "quantity",
     },
     {
       title: "Action",
@@ -123,6 +146,8 @@ const Product = ({ url }) => {
 
   return (
     <div className="p-6">
+      <SearchProduct onSearch={handleSearch}/>
+
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Product List</h1>
         <Button

@@ -12,6 +12,7 @@ const Update = ({ url }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [image, setImage] = useState(null);
 
   const token = localStorage.getItem("token");
@@ -19,12 +20,13 @@ const Update = ({ url }) => {
   useEffect(() => {
     const fetchFood = async () => {
       try {
-        const { data } = await axios.get(`${url}/api/food/${id}`);
-        setName(data.food.name);
-        setDescription(data.food.description);
-        setPrice(data.food.price);
-        setSelectedCategory(data.food.category);
-        setImagePreview(`${url}/images/${data.food.image}`);
+        const res = await axios.get(`${url}/api/product/get-product/${id}`);
+        setName(res.data.data.name);
+        setDescription(res.data.data.description);
+        setPrice(res.data.data.price);
+        setQuantity(res.data.data.quantity);
+        setSelectedCategory(res.data.data.category);
+        setImagePreview(res.data.data.imageUrl);
       } catch (error) {
         console.error("Failed to fetch food:", error);
         toast.error("Failed to fetch food details.");
@@ -34,9 +36,9 @@ const Update = ({ url }) => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
-          `${url}/api/category/get-list-category`
+          `${url}/api/category/get-all-category`
         );
-        setCategories(response.data.categories);
+        setCategories(response.data.category);
       } catch (error) {
         console.error("Failed to fetch categories:", error);
       }
@@ -67,19 +69,24 @@ const Update = ({ url }) => {
       formData.append("name", name);
       formData.append("description", description);
       formData.append("price", price);
+      formData.append("quantity", quantity)
       formData.append("category", selectedCategory);
       if (image) {
-        formData.append("image", image);
+        formData.append("imageUrl", image);
       }
 
-      const { data } = await axios.put(`${url}/api/food/update`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const { data } = await axios.put(
+        `${url}/api/product/update-product/${id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (data?.success) {
-        navigate("/food");
+        navigate("/product");
         toast.success(data?.message);
       } else {
         toast.error(data?.message);
@@ -121,12 +128,22 @@ const Update = ({ url }) => {
             type="number"
             name="price"
             value={price}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => setPrice(e.target.value)}
             className="border border-gray-300 p-2 w-full"
             required
           />
         </div>
-
+        <div className="mb-4">
+          <label className="block mb-2">Quantity:</label>
+          <input
+            type="number"
+            name="quantity"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            className="border border-gray-300 p-2 w-full"
+            required
+          />
+        </div>
         <div className="mb-4">
           <label className="block mb-2">Category:</label>
           <select
@@ -147,7 +164,17 @@ const Update = ({ url }) => {
         <div className="mb-4">
           <label className="block mb-2" htmlFor="image">
             Image:
-            <img alt="" src={imagePreview} />
+            <div className="w-full h-40 border flex items-center justify-center bg-gray-100">
+              {imagePreview ? (
+                <img
+                  alt="preview"
+                  src={imagePreview}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-gray-500">No Image Selected</span>
+              )}
+            </div>
           </label>
           <input
             type="file"
