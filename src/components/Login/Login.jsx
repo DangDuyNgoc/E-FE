@@ -4,7 +4,7 @@ import { assets } from "../../assets/assets";
 import "./Login.css";
 import { StoreContext } from "../../context/StoreContext";
 import { toast } from "react-toastify";
-import api from "../../utils/axiosInstance";
+import axios from "axios";
 
 const Login = ({ setShowLogin }) => {
   const { url, setToken, setUser } = useContext(StoreContext);
@@ -45,7 +45,7 @@ const Login = ({ setShowLogin }) => {
         newUrl += "/api/user/registration";
       }
 
-      const response = await api.post(newUrl, data);
+      const response = await axios.post(newUrl, data);
 
       if (response.data.user?.role === 1) {
         if (response.data.success) {
