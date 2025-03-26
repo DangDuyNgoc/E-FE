@@ -15,7 +15,7 @@ import { useState } from "react";
 
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
-  const url = "http://localhost:8080";
+  const url = `${import.meta.env.VITE_API_BACKEND}`;
 
   return (
     <StoreContextProvider>

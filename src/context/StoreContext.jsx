@@ -2,7 +2,7 @@
 import { createContext, useEffect, useState } from "react";
 
 export const StoreContext = createContext({
-  url: "http://localhost:8080",
+  url: `${import.meta.env.VITE_API_BACKEND}/api/user/refresh-token`,
   token: "",
   user: null,
   setToken: () => {},
@@ -123,7 +123,7 @@ const StoreContextProvider = (props) => {
   }, []);
 
   const contextValue = {
-    url: "http://localhost:8080",
+    url: `${import.meta.env.VITE_API_BACKEND}`,
     token,
     user,
     setToken: handleSetToken,

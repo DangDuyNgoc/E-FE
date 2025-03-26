@@ -79,7 +79,8 @@ const Product = ({ url }) => {
       });
 
       if (response.data.success) {
-        setProducts(response.data.data)
+        setProducts(response.data.data);
+        console.log(response.data.data);
       } else {
         setProducts([]);
       }
@@ -146,7 +147,7 @@ const Product = ({ url }) => {
 
   return (
     <div className="p-6">
-      <SearchProduct onSearch={handleSearch}/>
+      <SearchProduct onSearch={handleSearch} />
 
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Product List</h1>
